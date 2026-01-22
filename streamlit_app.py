@@ -28,6 +28,8 @@ def extract_gid(url: str) -> str:
     try:
         qs = parse_qs(urlparse(url).query)
         gid = qs.get("gid", ["0"])[0]
+        print(qs)
+        print(gid)
         return gid if gid else "0"
     except Exception:
         return "0"
@@ -41,6 +43,8 @@ def google_sheet_to_csv_url(sheet_url: str) -> str:
     if not sheet_id:
         raise ValueError("Could not find a Google Sheet ID in the URL.")
     gid = extract_gid(sheet_url)
+    print(sheet_id)
+    print(gid)
     # Works when the sheet is viewable without auth
     return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
 
@@ -291,7 +295,7 @@ with st.sidebar:
     if source == "Google Sheets":
         sheet_url = st.text_input(
             "Google Sheets URL",
-            value="https://docs.google.com/spreadsheets/d/1uw2V057vEJuZGLYs6zXiJrEJolRiDZvET3jnaMzsryw/edit?usp=sharing",
+            value="https://docs.google.com/spreadsheets/d/1uw2V057vEJuZGLYs6zXiJrEJolRiDZvET3jnaMzsryw/edit?gid=753516515#gid=753516515",
             help="Sheet must be viewable by anyone with the link (no login) for CSV export to work."
         )
         st.caption("Tip: if it fails, try File → Share → set 'Anyone with the link' → Viewer.")
@@ -345,7 +349,7 @@ for col in ["vendor", "title", "variant_title", "product_type", "display_name"]:
 # Sidebar filters (now that df exists)
 with st.sidebar:
     vendors = sorted([v for v in df["vendor"].dropna().unique().tolist() if str(v).strip() != ""])
-    selected_vendors = st.multiselect("Vendor", vendors, default=vendors[:10] if len(vendors) > 10 else vendors)
+    selected_vendors = st.multiselect("Vendor", vendors, default=vendors)
 
     # Numeric filter helpers
     def slider_for_col(label, col, default_min=None, default_max=None):
